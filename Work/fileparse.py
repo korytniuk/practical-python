@@ -16,7 +16,7 @@ def parse_csv(lines, select: list = [], types: list = [], has_headers=True, deli
     
     header = next(rows) if has_headers else []
     if select:
-        indices = [ header.index(x) for x in header ]
+        indices = [ header.index(x) for x in select]
         header = select
 
     for row in rows:
@@ -30,15 +30,16 @@ def parse_csv(lines, select: list = [], types: list = [], has_headers=True, deli
             if types:
                 row = [ func(val) for func, val in zip(types, row) ]
 
-            if has_headers
+            if has_headers:
                 record = dict(zip(header, row)) 
             else:
-                record = tuple([ k for k in row ])
+                record = tuple([k for k in row ])
 
             records.append(record)
         except ValueError as e:
             if not silence_error:
-                print(f'The record can\'t be create for: {row}')
+                print(f'The record can\'t be created for: {row}')
+                print(f'Error: {e}')
 
 
     return records 
