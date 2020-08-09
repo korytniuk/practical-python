@@ -9,10 +9,10 @@ def main(argv):
         filename = argv[1]
     else:
         filename = "Data/portfolio.csv"
-
-    records = parse_csv(filename, types=[str,int,float])
-    cost = sum([x['shares'] * x['price'] for x in records])
-    print(f'Total cost {cost:0.2f}')
+    with open(filename) as f:
+        records = parse_csv(f, types=[str,int,float])
+        cost = sum([x['shares'] * x['price'] for x in records])
+        print(f'Total cost {cost:0.2f}')
 
 if __name__ == '__main__':
     from sys import argv

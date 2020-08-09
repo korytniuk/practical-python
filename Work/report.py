@@ -2,44 +2,50 @@
 #
 # Exercise 2.4
 import csv
+import tableformat
+from stock import Stock
 from fileparse import parse_csv
 
-
-def print_report(report: list):
+def print_report(report: list, formatter):
     '''
-    Print report
+    Print a nicely formatted table from a list of (name, shares, price, change) tuples.
     '''
+    formatter.headings(['Name','Shares','Price','Change'])
+    for name, shares, price, change in report:
+        rowdata = [name, str(shares), f'{price:0.2f}', f'{change:0.2f}']
+        formatter.row(rowdata)
 
-    if len(report) == 0:
-        return 
+def read_portfolio(filename):
+    with open(filename) as lines:
+        return [Stock(r['name'],r['shares'],r['price']) for r in parse_csv(lines, types=[str,int,float])]
 
-    keys = report[0].keys()
-    delimiter = ' '.join([f'{"_"*10}' for key in keys])
-    header =  ' '.join([f'{key.capitalize():>10s}' for key in keys])
+def read_prices(filename):
+    with open(filename) as lines:
+        return dict(parse_csv(lines, types=[str,float], has_headers=False))
 
-    print(header, '\n', delimiter)
-    for row in report:
-        print(' '.join([f'{str(x):>10s}' for x in row.values()]))
+def make_report_data(portfolio, prices):
+    combined = []
 
+    for x in portfolio:
+        parsed = x.__dict__
+        parsed['change'] = prices[x.name] - x.price
+        combined.append(tuple(parsed.values())) 
 
-def combine(report, prices):
-    prices = dict(prices)
-    for x in report:
-        change= x['price'] - prices[x['name']]
-        x['change'] = f'{change:0.2f}'
+    return combined
 
-    return report 
+def portfolio_report(f1, f2, fmt='txt'):
+    port = read_portfolio(f1)
+    prices = read_prices(f2)
+    combined = make_report_data(port, prices)
+    formatter = tableformat.create_formatter(fmt)
+    print_report(combined, formatter)
 
-
-def portfolio_report(f1: str, f2: str):
-    '''
-    Read portfolio and pirces and print them
-    '''
-    print_report(combine(parse_csv(f1, types=[str,int,float]), parse_csv(f2, types=[str,float], has_headers=False)))
 
 def main(argv):
     if len(argv) == 3:
         portfolio_report(argv[1], argv[2])
+    if len(argv) == 4:
+        portfolio_report(argv[1], argv[2], argv[3])
     else:
         print(f'Invalid usage')
 if __name__ == '__main__':
