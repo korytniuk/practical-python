@@ -38,7 +38,7 @@ class CSVTableFormatter(TableFormatter):
         print(','.join(headers))
     
     def row(self, rowdata):
-        print(','.join(rowdata))
+        print(','.join([str(i) for i in rowdata]))
 
 class HTMLTableFormatter(TableFormatter):
     '''
@@ -50,6 +50,8 @@ class HTMLTableFormatter(TableFormatter):
     def row(self, rowdata):
         print(f'<tr>{"".join([f"<td>{d}</td>" for d in rowdata])}</tr>')
 
+class FormatError(Exception):
+    pass
 
 def create_formatter(fmt):
     if fmt == 'txt':
@@ -59,7 +61,7 @@ def create_formatter(fmt):
     if fmt == 'html':
         return HTMLTableFormatter()
 
-    raise NotImplementedError() 
+    raise FormatError(f'Unknown table format: {fmt}') 
 
 def print_table(data, columns, fmt):
     fmt.headings(columns) 

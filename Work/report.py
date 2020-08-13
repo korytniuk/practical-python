@@ -5,6 +5,7 @@ import csv
 import tableformat
 from stock import Stock
 from fileparse import parse_csv
+from portfolio import Portfolio
 
 def print_report(report: list, formatter):
     '''
@@ -17,7 +18,9 @@ def print_report(report: list, formatter):
 
 def read_portfolio(filename):
     with open(filename) as lines:
-        return [Stock(r['name'],r['shares'],r['price']) for r in parse_csv(lines, types=[str,int,float])]
+        portfolio = [Stock(r['name'],r['shares'],r['price']) for r in parse_csv(lines, types=[str,int,float])]
+
+    return Portfolio(portfolio)
 
 def read_prices(filename):
     with open(filename) as lines:
